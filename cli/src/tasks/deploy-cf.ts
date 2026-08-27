@@ -146,6 +146,7 @@ export async function runCloudflareDeploy(target: "all" | "server" | "client" = 
   const workerName = renv("WORKER_NAME", "rin-server");
   const taskQueueName = env("TASK_QUEUE_NAME", env("AI_SUMMARY_QUEUE_NAME", `${workerName}-tasks`)) ?? `${workerName}-tasks`;
   const r2BucketName = env("R2_BUCKET_NAME", "");
+  const readingDataBucketName = env("READING_DATA_BUCKET_NAME", "readingdata");
   const s3Endpoint = env("S3_ENDPOINT", "");
   const s3AccessHost = env("S3_ACCESS_HOST", "");
   const s3Bucket = env("S3_BUCKET", "");
@@ -265,6 +266,15 @@ export async function runCloudflareDeploy(target: "all" | "server" | "client" = 
       preview_bucket_name = "${r2BucketName}"
     `)} >> wrangler.toml`.quiet();
   }
+
+  if (readingDataBucketName) {
+  await $`echo ${stripIndent(`
+    [[r2_buckets]]
+    binding = "READING_DATA_BUCKET"
+    bucket_name = "${readingDataBucketName}"
+    preview_bucket_name = "${readingDataBucketName}"
+  `)} >> wrangler.toml`.quiet();
+}
 
   const migrationVersion = await getMigrationVersion("remote", dbName);
   const infoExists = await isInfoExist("remote", dbName);

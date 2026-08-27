@@ -3,6 +3,7 @@
 
 import { getAuthToken } from "../utils/auth";
 import { endpoint } from "../config";
+import type { BookListResponse, BookDetail } from "@rin/api";
 
 // Import shared types
 import type {
@@ -450,6 +451,19 @@ class MomentsAPI {
   }
 }
 
+class BooksAPI {
+  constructor(private http: HttpClient) {}
+
+  async list(): Promise<ApiResponse<BookListResponse>> {
+    return this.http.get<BookListResponse>("/api/books");
+  }
+
+  async get(id: string): Promise<ApiResponse<BookDetail>> {
+    return this.http.get<BookDetail>(`/api/books/${encodeURIComponent(id)}`);
+  }
+}
+
+
 /**
  * Config API methods
  */
@@ -657,6 +671,7 @@ export class ApiClient {
   user: UserAPI;
   friend: FriendAPI;
   moments: MomentsAPI;
+  books: BooksAPI;
   config: ConfigAPI;
   aiConfig: AIConfigAPI;
   storage: StorageAPI;
@@ -673,6 +688,7 @@ export class ApiClient {
     this.user = new UserAPI(this.http);
     this.friend = new FriendAPI(this.http);
     this.moments = new MomentsAPI(this.http);
+    this.books = new BooksAPI(this.http);
     this.config = new ConfigAPI(this.http);
     this.aiConfig = new AIConfigAPI(this.http);
     this.storage = new StorageAPI(this.http);

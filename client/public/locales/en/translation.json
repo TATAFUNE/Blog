@@ -231,6 +231,16 @@
     "total$count_one": "{{count}} moment in total",
     "total$count_other": "{{count}} moments in total"
   },
+  "books": {
+      "title": "Books",
+      "read": "Read",
+      "reading": "Reading",
+      "want": "Want to read",
+      "total": "{{count}} records in total",
+      "empty": "No content available",
+      "reviews": "Reviews",
+      "excerpts": "Excerpts"
+    },
   "next": "Next Page",
   "no_more": "No More",
   "preview": "Preview",

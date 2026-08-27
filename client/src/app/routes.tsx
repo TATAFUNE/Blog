@@ -21,6 +21,8 @@ import { HashtagPage } from "../page/hashtag";
 import { HashtagsPage } from "../page/hashtags";
 import { LoginPage } from "../page/login";
 import { MomentsPage } from "../page/moments";
+import { BooksPage } from "../page/books";
+import { BookDetailPage } from "../page/book-detail";
 import { ProfilePage } from "../page/profile";
 import { QueueStatusPage } from "../page/queue-status";
 import { SearchPage } from "../page/search";
@@ -47,7 +49,13 @@ export function AppRoutes() {
       <AppRoute path="/moments">
         <MomentsPage />
       </AppRoute>
-
+      <AppRoute path="/books">
+        <BooksPage />
+      </AppRoute>
+      
+      <AppRoute path="/books/:id">
+        {(params) => <BookDetailPage id={params.id || ""} />}
+      </AppRoute>
       <AppRoute path="/friends">
         <FriendsPage />
       </AppRoute>

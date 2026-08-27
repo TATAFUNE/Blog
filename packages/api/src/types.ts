@@ -255,7 +255,38 @@ export interface MomentListResponse {
   data: Moment[];
   hasNext: boolean;
 }
+export type BookStatus = "want" | "reading" | "read";
 
+export interface BookCard {
+  id: string;
+  key: string;
+  title: string;
+  author: string;
+  cover: string;
+  url: string;
+  press: string;
+  pubdate: string;
+  status: BookStatus;
+  rating: number | null;
+  dateLabel: string | null;
+}
+
+export interface BookListResponse {
+  read: BookCard[];
+  reading: BookCard[];
+  want: BookCard[];
+  counts: { read: number; reading: number; want: number };
+}
+
+export interface BookNote {
+  content: string;
+  createTime: number;
+}
+
+export interface BookDetail extends BookCard {
+  reviews: BookNote[];
+  excerpts: BookNote[];
+}
 // ============================================================================
 // Config Types
 // ============================================================================

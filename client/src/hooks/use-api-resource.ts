@@ -10,10 +10,15 @@ export type ApiResourceState<T> = {
 export function useApiResource<T>(load: () => Promise<ApiResponse<T>>) {
   const requestIdRef = useRef(0);
   const mountedRef = useRef(true);
+  const loadRef = useRef(load);
   const [state, setState] = useState<ApiResourceState<T>>({
     data: null,
     error: null,
     loading: true,
+  });
+
+  useEffect(() => {
+    loadRef.current = load;
   });
 
   useEffect(() => {
@@ -30,7 +35,7 @@ export function useApiResource<T>(load: () => Promise<ApiResponse<T>>) {
     setState((current) => ({ ...current, error: null, loading: true }));
 
     try {
-      const response = await load();
+      const response = await loadRef.current(); // ù© óp ref ó¢ìIù≈ùVî≈ñ{
       if (!mountedRef.current || requestId !== requestIdRef.current) {
         return null;
       }
@@ -52,7 +57,7 @@ export function useApiResource<T>(load: () => Promise<ApiResponse<T>>) {
       setState((current) => ({ ...current, error: message, loading: false }));
       return null;
     }
-  }, [load]);
+  }, []);
 
   useEffect(() => {
     void reload();

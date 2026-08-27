@@ -222,6 +222,16 @@
     "total$count_one": "{{count}} 件の動態",
     "total$count_other": "{{count}} 件の動態"
   },
+  "books": {
+      "title": "本",
+      "read": "読了",
+      "reading": "読書中",
+      "want": "読みたい",
+      "total": "全 {{count}} 件",
+      "empty": "コンテンツがありません",
+      "reviews": "レビュー",
+      "excerpts": "抜粋"
+    },
   "next": "次のページ",
   "no_more": "もうない",
   "preview": "プレビュー",
