@@ -18,7 +18,7 @@ export function BooksPage() {
   const [tab, setTab] = useState<Tab>("read");
   const { data, loading } = useApiResource<BookListResponse>(() => client.books.list());
 
-  // ?èò??ùB?ÅFõﬂä≈ / ç›ä≈ / ëzä≈
+  // tab ÂàÜÁ±ªÔºöÂ∑≤ËØª / Âú®ËØª / ÊÉ≥ËØª
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: "read", label: t("books.read"), count: data?.counts.read ?? 0 },
     { key: "reading", label: t("books.reading"), count: data?.counts.reading ?? 0 },
@@ -45,7 +45,7 @@ export function BooksPage() {
                   tab === key ? "bg-theme text-white" : "bg-secondary t-primary bg-button"
                 }`}
               >
-                {label} ? {count}
+                {label} ¬∑ {count}
               </button>
             ))}
           </div>
@@ -83,8 +83,8 @@ function BookCardItem({ book }: { book: BookCard }) {
       <p className="mt-2 w-full truncate text-sm">{book.title}</p>
       {book.rating != null && (
         <div className="text-theme text-xs">
-          {"Åö".repeat(book.rating)}
-          <span className="text-neutral-400">{"Åö".repeat(5 - book.rating)}</span>
+          {"‚òÖ".repeat(book.rating)}
+          <span className="text-neutral-400">{"‚òÜ".repeat(5 - book.rating)}</span>
         </div>
       )}
     </Link>

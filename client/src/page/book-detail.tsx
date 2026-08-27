@@ -40,11 +40,11 @@ export function BookDetailPage({ id }: { id: string }) {
                   {book.title}
                 </a>
                 <p className="text-sm text-neutral-500 mt-1">{book.author}</p>
-                <p className="text-xs text-neutral-500 mt-1">{[book.press, book.pubdate].filter(Boolean).join(" ? ")}</p>
+                <p className="text-xs text-neutral-500 mt-1">{[book.press, book.pubdate].filter(Boolean).join(" ¬∑ ")}</p>
                 {book.rating != null && (
                   <div className="text-theme text-sm mt-2">
-                    {"Åö".repeat(book.rating)}
-                    <span className="text-neutral-400">{"Åö".repeat(5 - book.rating)}</span>
+                    {"‚òÖ".repeat(book.rating)}
+                    <span className="text-neutral-400">{"‚òÜ".repeat(5 - book.rating)}</span>
                   </div>
                 )}
               </div>

@@ -35,13 +35,14 @@ export function ImageWithFallback({
       </span>
       {normalizedSrc ? (
         <img
-          {...props}
-          ref={imageRef}
-          src={normalizedSrc}
-          alt={failed ? "" : alt}
-          onLoad={onLoad}
-          onError={onError}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity ${failed ? "opacity-0" : "opacity-100"} ${imageClassName}`}
+         {...props}
+         ref={imageRef}
+         src={normalizedSrc}
+         alt={failed ? "" : alt}
+         referrerPolicy="no-referrer"
+         onLoad={onLoad}
+         onError={onError}
+         className={`absolute inset-0 h-full w-full object-cover transition-opacity ${failed ? "opacity-0" : "opacity-100"} ${imageClassName}`}
         />
       ) : null}
     </span>
