@@ -28,6 +28,7 @@ import { QueueStatusPage } from "../page/queue-status";
 import { SearchPage } from "../page/search";
 import { Settings } from "../page/settings";
 import { TimelinePage } from "../page/timeline";
+import { ArchivePage } from "../page/archive";
 import { WritingPage } from "../page/writing";
 import { ProfileContext } from "../state/profile";
 import { tryInt } from "../utils/int";
@@ -46,13 +47,17 @@ export function AppRoutes() {
         <TimelinePage />
       </AppRoute>
 
+      <AppRoute path="/archive">
+        <ArchivePage />
+      </AppRoute>
+
       <AppRoute path="/moments">
         <MomentsPage />
       </AppRoute>
       <AppRoute path="/books">
         <BooksPage />
       </AppRoute>
-      
+
       <AppRoute path="/books/:id">
         {(params) => <BookDetailPage id={params.id || ""} />}
       </AppRoute>
@@ -109,11 +114,11 @@ export function AppRoutes() {
       </AppRoute>
 
       <TocRoute path="/feed/:id">
-        {(params, toc, cleanup) => <FeedPage id={params.id || ""} TOC={toc} clean={cleanup} />}
+        {(params, toc, cleanup, hasToc) => <FeedPage id={params.id || ""} TOC={toc} clean={cleanup} hasToc={hasToc} />}
       </TocRoute>
 
       <TocRoute path="/:alias">
-        {(params, toc, cleanup) => <FeedPage id={params.alias || ""} TOC={toc} clean={cleanup} />}
+        {(params, toc, cleanup, hasToc) => <FeedPage id={params.alias || ""} TOC={toc} clean={cleanup} hasToc={hasToc} />}
       </TocRoute>
 
       <AppRoute path="/user/github">
@@ -212,13 +217,19 @@ function TocRoute({
   children,
 }: {
   path: PathPattern;
-  children: (params: DefaultParams, toc: () => JSX.Element, cleanup: (id: string) => void) => ReactNode;
+  children: (params: DefaultParams, toc: () => JSX.Element, cleanup: (id: string) => void, hasToc: boolean) => ReactNode;
 }) {
-  const { TOC, cleanup } = useTableOfContents(".toc-content");
+  const { TOC, cleanup, hasToc: hasTocRaw } = useTableOfContents(".toc-content");
+  const hasToc = !!hasTocRaw; // ???y“I boolean ?Œ^ (undefined ‰ï?¬ false)
+  const renderTOC = () => TOC() ?? <></>;
 
   return (
-    <AppRoute path={path} headerComponent={TOCHeader({ TOC })} paddingClassName="mx-4">
-      {(params) => children(params, TOC, cleanup)}
+    <AppRoute
+      path={path}
+      headerComponent={hasToc ? TOCHeader({ TOC: renderTOC }) : undefined}
+      paddingClassName="mx-4"
+    >
+      {(params) => children(params, renderTOC, cleanup, hasToc)}
     </AppRoute>
   );
 }

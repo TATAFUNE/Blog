@@ -178,6 +178,7 @@
   "footer": {
     "rss": "RSS 購読リンク"
   },
+  "optional": "任意",
   "friends": {
     "apply": "友人リンクを申請",
     "create": "友人リンクを作成",
@@ -222,6 +223,8 @@
     "total$count_one": "{{count}} 件の動態",
     "total$count_other": "{{count}} 件の動態"
   },
+  "photography": "写真",
+  "archive": "アーカイブ",
   "books": {
       "title": "本",
       "read": "読了",

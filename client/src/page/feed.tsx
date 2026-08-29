@@ -31,7 +31,7 @@ function extractFirstMarkdownImageUrl(content: string) {
   return stripImageUrlMetadata(match[1]);
 }
 
-export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Element, clean: (id: string) => void }) {
+export function FeedPage({ id, TOC, clean, hasToc }: { id: string, TOC: () => JSX.Element, clean: (id: string) => void, hasToc: boolean }) {
   const { t } = useTranslation();
   const siteConfig = useSiteConfig();
   const profile = useContext(ProfileContext);
@@ -182,7 +182,7 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
         )}
         {feed && !error && (
           <>
-            <div className="xl:w-64" />
+            {hasToc && <div className="xl:w-64" />}
             <main className="wauto">
               <article
                 className="rounded-2xl bg-w m-2 px-6 py-4"
@@ -309,13 +309,13 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
               {feed && <Comments id={`${feed.id}`} />}
               <div className="h-16" />
             </main>
-            <div className="w-80 hidden lg:block relative">
-              <div
-                className={`start-0 end-0 top-[5.5rem] sticky`}
-              >
-                <TOC />
+            {hasToc && (
+              <div className="w-80 hidden lg:block relative">
+                <div className="start-0 end-0 top-[5.5rem] sticky">
+                  <TOC />
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>

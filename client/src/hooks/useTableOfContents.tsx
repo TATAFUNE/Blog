@@ -89,10 +89,11 @@ const useTableOfContents = (selector: string) => {
     const TOC = useCallback(() => {
         const { tableOfContents, activeIndex, t } = tocStateRef.current
 
+        if (tableOfContents.length === 0) return null   // –v—L??AY?“s•s?õ
+
         return <div className='rounded-2xl bg-w py-4 px-4 t-primary'>
             <h2 className="text-lg font-bold">{t("index.title")}</h2>
             <ul className="max-h-[calc(100vh-10.25rem)] overflow-auto" style={{ scrollbarWidth: "none" }}>
-                {tableOfContents.length === 0 && <li>{t("index.empty.title")}</li>}
                 {tableOfContents.map((item) => (
                     <li
                         key={`toc$${item.index}`}
@@ -100,10 +101,7 @@ const useTableOfContents = (selector: string) => {
                         style={{ marginLeft: item.marginLeft }}
                         onClick={() => {
                             const top = item.element.getBoundingClientRect().top + window.scrollY - getHeaderScrollOffset()
-                            window.scrollTo({
-                                top: Math.max(top, 0),
-                                behavior: 'smooth'
-                            })
+                            window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' })
                         }}
                     >
                         {item.text}
@@ -112,6 +110,10 @@ const useTableOfContents = (selector: string) => {
             </ul>
         </div>
     }, [])
+
+    return {
+        TOC, cleanup, hasToc: tableOfContents.length > 0   // Vú
+    }
 
     return {
         TOC, cleanup

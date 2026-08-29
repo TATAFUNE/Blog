@@ -178,6 +178,7 @@
   "footer": {
     "rss": "RSS Subscription Link"
   },
+  "optional": "Optional",
   "friends": {
     "apply": "Apply for Friend Link",
     "create": "Create Friend Link",
@@ -231,6 +232,8 @@
     "total$count_one": "{{count}} moment in total",
     "total$count_other": "{{count}} moments in total"
   },
+  "photography": "Photography",
+  "archive": "Archive",
   "books": {
       "title": "Books",
       "read": "Read",

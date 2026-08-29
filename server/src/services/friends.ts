@@ -15,22 +15,22 @@ export function FriendService(): Hono {
         const admin = c.get('admin');
         const uid = c.get('uid');
         const db = c.get('db');
-        
+
         const friend_list = await profileAsync(c, 'friend_list_db', () => (admin
             ? db.query.friends.findMany({
                 orderBy: (friends: any, { asc, desc }: { asc: any, desc: any }) => [
-                    desc(friends.sort_order), 
+                    desc(friends.sort_order),
                     asc(friends.createdAt)
                 ]
             })
             : db.query.friends.findMany({
                 where: eq(friends.accepted, 1),
                 orderBy: (friends: any, { asc, desc }: { asc: any, desc: any }) => [
-                    desc(friends.sort_order), 
+                    desc(friends.sort_order),
                     asc(friends.createdAt)
                 ]
             })));
-            
+
         const apply_list = uid ? await profileAsync(c, 'friend_apply_lookup', () => db.query.friends.findFirst({ where: eq(friends.uid, uid) })) : null;
         return c.json({ friend_list, apply_list });
     });
@@ -46,34 +46,39 @@ export function FriendService(): Hono {
         const serverConfig = c.get('serverConfig');
         const body = await profileAsync(c, 'friend_create_parse', () => c.req.json());
         const { name, desc, avatar, url } = body;
-        
+        const finalAvatar = avatar && avatar.length > 0 ? avatar : '/avatar.png'; // 留空则用站点默认头像
+
         const enable = await profileAsync(c, 'friend_create_config', () => clientConfig.getOrDefault('friend_apply_enable', true));
         if (!enable && !admin) {
             return c.text('Friend Link Apply Disabled', 403);
         }
-        
-        if (name.length > 20 || desc.length > 100 || avatar.length > 100 || url.length > 100) {
-            return c.text('Invalid input', 400);
+
+        const errors: string[] = [];
+        if (name.length === 0) errors.push('name is required');
+        if (name.length > 20) errors.push('name too long (max 20)');
+        if (desc.length === 0) errors.push('description is required');
+        if (desc.length > 100) errors.push('description too long (max 100)');
+        if (url.length === 0) errors.push('url is required');
+        if (url.length > 100) errors.push('url too long (max 100)');
+        if (finalAvatar.length > 100) errors.push('avatar url too long (max 100)');
+        if (errors.length > 0) {
+            return c.text(`Invalid input: ${errors.join(', ')}`, 400);
         }
-        
-        if (name.length === 0 || desc.length === 0 || avatar.length === 0 || url.length === 0) {
-            return c.text('Invalid input', 400);
-        }
-        
+
         if (!uid) {
             return c.text('Unauthorized', 401);
         }
-        
+
         if (!admin) {
             const exist = await profileAsync(c, 'friend_create_existing', () => db.query.friends.findFirst({ where: eq(friends.uid, uid) }));
             if (exist) {
                 return c.text('Already sent', 400);
             }
         }
-        
+        // ... 后面 insert 时把 avatar 换成 finalAvatar
         const accepted = admin ? 1 : 0;
         await profileAsync(c, 'friend_create_insert', () => db.insert(friends).values({
-            name, desc, avatar, url, uid: uid, accepted
+            name, desc, avatar: finalAvatar, url, uid: uid, accepted
         }));
 
         if (!admin) {
@@ -120,37 +125,37 @@ export function FriendService(): Hono {
         const id = c.req.param('id');
         const body = await profileAsync(c, 'friend_update_parse', () => c.req.json());
         const { name, desc, avatar, url, accepted, sort_order } = body;
-        
+
         const enable = await profileAsync(c, 'friend_update_config', () => clientConfig.getOrDefault('friend_apply_enable', true));
         if (!enable && !admin) {
             return c.text('Friend Link Apply Disabled', 403);
         }
-        
+
         if (!uid) {
             return c.text('Unauthorized', 401);
         }
-        
+
         const exist = await profileAsync(c, 'friend_update_lookup', () => db.query.friends.findFirst({ where: eq(friends.id, parseInt(id)) }));
         if (!exist) {
             return c.text('Not found', 404);
         }
-        
+
         if (!admin && exist.uid !== uid) {
             return c.text('Permission denied', 403);
         }
-        
+
         let finalAccepted = accepted;
         let finalSortOrder = sort_order;
-        
+
         if (!admin) {
             finalAccepted = 0;
             finalSortOrder = undefined;
         }
-        
+
         function wrap(s: string | undefined) {
             return s ? s.length === 0 ? undefined : s : undefined;
         }
-        
+
         await profileAsync(c, 'friend_update_db', () => db.update(friends).set({
             name: wrap(name),
             desc: wrap(desc),
@@ -159,7 +164,7 @@ export function FriendService(): Hono {
             accepted: finalAccepted === undefined ? undefined : finalAccepted,
             sort_order: finalSortOrder === undefined ? undefined : finalSortOrder,
         }).where(eq(friends.id, parseInt(id))));
-        
+
         if (!admin) {
             const {
                 webhookUrl,
@@ -198,20 +203,20 @@ export function FriendService(): Hono {
         const uid = c.get('uid');
         const db = c.get('db');
         const id = c.req.param('id');
-        
+
         if (!uid) {
             return c.text('Unauthorized', 401);
         }
-        
+
         const exist = await profileAsync(c, 'friend_delete_lookup', () => db.query.friends.findFirst({ where: eq(friends.id, parseInt(id)) }));
         if (!exist) {
             return c.text('Not found', 404);
         }
-        
+
         if (!admin && exist.uid !== uid) {
             return c.text('Permission denied', 403);
         }
-        
+
         await profileAsync(c, 'friend_delete_db', () => db.delete(friends).where(eq(friends.id, parseInt(id))));
         return c.text('OK');
     });
@@ -229,28 +234,28 @@ export async function friendCrontab(
 ) {
     const enable = await serverConfig.getOrDefault('friend_crontab', true);
     const ua = await serverConfig.get('friend_ua') || 'Rin-Check/0.1.0';
-    
+
     if (!enable) {
         console.info('friend crontab disabled');
         return;
     }
-    
+
     const friend_list = await db.query.friends.findMany();
     console.info(`total friends: ${friend_list.length}`);
-    
+
     let health = 0;
     let unhealthy = 0;
-    
+
     for (const friend of friend_list) {
         console.info(`checking ${friend.name}: ${friend.url}`);
         try {
-            const response = await fetch(new Request(friend.url, { 
-                method: 'GET', 
-                headers: { 'User-Agent': ua } 
+            const response = await fetch(new Request(friend.url, {
+                method: 'GET',
+                headers: { 'User-Agent': ua }
             }));
             console.info(`response status: ${response.status}`);
             console.info(`response statusText: ${response.statusText}`);
-            
+
             if (response.ok) {
                 ctx.waitUntil(db.update(schema.friends).set({ health: "" }).where(eq(schema.friends.id, friend.id)));
                 health++;
@@ -264,6 +269,6 @@ export async function friendCrontab(
             unhealthy++;
         }
     }
-    
+
     console.info(`update friends health done. Total: ${health + unhealthy}, Healthy: ${health}, Unhealthy: ${unhealthy}`);
 }

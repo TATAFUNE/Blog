@@ -178,6 +178,7 @@
   "footer": {
     "rss": "RSS 订阅链接"
   },
+  "optional": "可选",
   "friends": {
     "apply": "申请友链",
     "create": "创建友链",
@@ -231,6 +232,8 @@
     "total$count_one": "{{count}} 条动态",
     "total$count_other": "{{count}} 条动态"
   },
+  "photography": "摄影",
+  "archive": "归档",
   "books": {
     "title": "阅读",
     "read": "已看",
